@@ -71,7 +71,8 @@ const identity = { id: PLAYER_ID, name: sessionStorage.getItem('railbound-player
 function roomKey(code) { return `railbound-room-${code}`; }
 function loadRoom() {
   const hashCode = new URLSearchParams(location.hash.replace(/^#/, '')).get('room');
-  const code = sessionStorage.getItem('railbound-active-room') || hashCode;
+  // 초대 링크의 코드는 기존 탭의 방보다 우선합니다.
+  const code = hashCode || sessionStorage.getItem('railbound-active-room');
   if (!code) return null;
   try { return JSON.parse(localStorage.getItem(roomKey(code))); } catch { return null; }
 }
@@ -177,6 +178,17 @@ function joinRoom() {
 function startGame() { if (!room || room.host !== identity.id) return; room.status='playing'; saveRoom(); resetGame(); render(); }
 function copyRoomLink() { const link = `${location.origin}${location.pathname}#room=${room.code}`; navigator.clipboard?.writeText(link).catch(()=>{}); toast(`초대 링크를 복사했습니다: ${room.code}`); }
 function leaveRoom() { if (room) { room.players=room.players.filter(p=>p.id!==identity.id); saveRoom(); } sessionStorage.removeItem('railbound-active-room'); room=null; history.replaceState(null,'',location.pathname); render(); }
+window.addEventListener('storage', (event) => {
+  if (!room) return;
+  if (event.key === roomKey(room.code)) {
+    try { room = JSON.parse(event.newValue); } catch { return; }
+    if (room?.status === 'playing') state = loadState();
+    render();
+  } else if (event.key === `railbound-game-${room.code}` && room.status === 'playing') {
+    try { state = JSON.parse(event.newValue); } catch { return; }
+    render();
+  }
+});
 function selectedRouteMarkup() {
   const r = state.routes.find(x=>x.id===state.selectedRoute);
   if (!r) return '<div class="empty-selection"><span>⌁</span><p>지도에서 노선을<br>선택해 주세요.</p></div>';
