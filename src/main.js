@@ -55,6 +55,7 @@ const initialState = {
     { name: 'Mina', color: '#4e8dbe', trains: 38, score: 42, hand: { red: 1, orange: 2, yellow: 4, green: 1, blue: 2, purple: 3, black: 1, white: 2, wild: 0 }, tickets: ['Vancouver – Montreal'] },
     { name: 'Joon', color: '#e4b845', trains: 31, score: 27, hand: { red: 3, orange: 1, yellow: 2, green: 3, blue: 1, purple: 2, black: 1, white: 2, wild: 0 }, tickets: ['Duluth – Houston'] },
     { name: 'Sora', color: '#69a77b', trains: 45, score: 19, hand: { red: 1, orange: 2, yellow: 1, green: 4, blue: 2, purple: 1, black: 2, white: 1, wild: 0 }, tickets: ['Seattle – New York'] },
+    { name: 'Hana', color: '#9d77ad', trains: 40, score: 24, hand: { red: 2, orange: 1, yellow: 3, green: 1, blue: 2, purple: 2, black: 2, white: 1, wild: 0 }, tickets: ['Boston – Miami'] },
   ],
   faceUp: ['red', 'blue', 'wild', 'yellow', 'green'],
   deckCount: 93,
@@ -92,6 +93,7 @@ function resetGame() {
   });
   state.players[0].id = identity.id;
   state.players[0].name = identity.name;
+  state.players.forEach((player, index) => { if (!player.id) player.id = `bot-${index}`; });
   saveState();
 }
 function esc(value) { return String(value).replace(/[&<>"']/g, (x) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;' }[x])); }
